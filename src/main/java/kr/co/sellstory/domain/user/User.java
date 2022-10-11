@@ -23,17 +23,20 @@ import java.util.stream.Collectors;
 public class User extends BaseEntity implements UserDetails {
     @Override
     public String toString() {
-        return "email: " + getEmail();
+        return "nickname: " + nickname;
     }
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long id;
 
-    private String email;
     private String nickname;
     private String password;
-    private String avatar;
+    private boolean working;
+    private String job;
+    private int postCount;
+    private int purchaseCount;
+    private int point;
 
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -49,13 +52,12 @@ public class User extends BaseEntity implements UserDetails {
 
 
     public User(UserSignupRequestDto request) {
-        email = request.getEmail();
         password = request.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return email;
+        return nickname;
     }
 
     @Override
@@ -78,9 +80,8 @@ public class User extends BaseEntity implements UserDetails {
         return true;
     }
 
-    public void update(String nickname, String avatar) {
+    public void update(String nickname) {
         this.nickname = nickname;
-        this.avatar = avatar;
     }
 
 
