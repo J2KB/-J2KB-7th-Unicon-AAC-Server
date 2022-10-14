@@ -1,6 +1,7 @@
 package kr.co.sellstory.domain.post;
 
 import kr.co.sellstory.domain.BaseEntity;
+import kr.co.sellstory.domain.user.User;
 import kr.co.sellstory.dto.expPostDto.ExpPostDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,9 +20,9 @@ public class ExperiencePost extends BaseEntity {
     private Long id;
 
     //TODO: 송경석 유저 완성 되면 다시 연결
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String title;
     private String content;
