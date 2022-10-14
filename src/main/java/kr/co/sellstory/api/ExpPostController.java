@@ -11,12 +11,12 @@ public class ExpPostController {
 
     private final ExpPostService expPostService;
 
-    @PostMapping(value = "/v1/quiz")
+    @PostMapping(value = "/v1/experience")
     public void create(@RequestBody ExpPostDto expPostDto) {
         expPostService.save(expPostDto);
     }
 
-    @GetMapping(value = "/v1/quiz")
+    @GetMapping(value = "/v1/experience")
     public ExpPostDto getQuiz(@RequestParam(name = "id") Long id) {
         return expPostService.getQuiz(id);
     }
