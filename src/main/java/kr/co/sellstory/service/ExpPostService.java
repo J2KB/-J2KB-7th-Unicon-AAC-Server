@@ -22,7 +22,7 @@ public class ExpPostService {
         return ExpPostDto.entityToDto(savedExperiencePost);
     }
 
-    public ExpPostDto getQuiz(Long id) {
+    public ExpPostDto getExpPost(Long id) {
         ExperiencePost findExperiencePost = expPostRepository.findById(id).orElseThrow(EntityNotFoundException::new);
         return ExpPostDto.entityToDto(findExperiencePost);
     }

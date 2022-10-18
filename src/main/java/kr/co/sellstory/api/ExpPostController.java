@@ -18,6 +18,6 @@ public class ExpPostController {
 
     @GetMapping(value = "/v1/experience")
     public ExpPostDto getQuiz(@RequestParam(name = "id") Long id) {
-        return expPostService.getQuiz(id);
+        return expPostService.getExpPost(id);
     }
 }

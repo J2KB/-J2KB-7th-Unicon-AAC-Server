@@ -51,4 +51,6 @@ public class ExperiencePost extends BaseEntity {
 
     // 비지니스 로직
 
+
+
 }
