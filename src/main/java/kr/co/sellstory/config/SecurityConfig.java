@@ -1,10 +1,13 @@
 package kr.co.sellstory.config;
 
+import kr.co.sellstory.service.auth.PrincipalOauth2UserService;
 import kr.co.sellstory.service.jwt.JwtAuthenticationFilter;
 import kr.co.sellstory.service.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,12 +22,17 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.security.Principal;
+
 @Slf4j
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 //    private final TempJwtTokenService jwtTokenProvider;
+
+    private PrincipalOauth2UserService principalOauth2UserService;
 
     // 암호화에 필요한 PasswordEncoder 를 Bean 등록
     @Bean
@@ -43,6 +51,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        http.authorizeRequests()
+                .antMatchers("/user/**").authenticated()
+                .antMatchers("/manager/**").access("hasRole('MANAGER') or hasRole('ADMIN')")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().permitAll()
+                .and()					//추가
+                .oauth2Login()				// OAuth2기반의 로그인인 경우
+                .loginPage("/loginForm")		// 인증이 필요한 URL에 접근하면 /loginForm으로 이동
+                .defaultSuccessUrl("/")			// 로그인 성공하면 "/" 으로 이동
+                .failureUrl("/loginForm")		// 로그인 실패 시 /loginForm으로 이동
+                .userInfoEndpoint()			// 로그인 성공 후 사용자정보를 가져온다
+                .userService(principalOauth2UserService);	//사용자정보를 처리할 때 사용한다
+
         http
                 .httpBasic().disable() // rest api 만을 고려하여 기본 설정은 해제
                 .csrf().disable() // csrf 보안 토큰 disable처리.
@@ -59,6 +81,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
                         UsernamePasswordAuthenticationFilter.class);
+
+
         // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
     }
 

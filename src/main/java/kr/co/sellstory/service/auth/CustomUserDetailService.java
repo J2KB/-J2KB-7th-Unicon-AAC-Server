@@ -1,7 +1,10 @@
 package kr.co.sellstory.service.auth;
 
+import kr.co.sellstory.domain.user.User;
 import kr.co.sellstory.repository.UserRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,7 +17,11 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByNickname(username)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+
+        User byUsername = userRepository.findByNickname(username);
+        if(byUsername != null){
+            return new PrincipalDetails(byUsername);
+        }
+        return null;
     }
 }
