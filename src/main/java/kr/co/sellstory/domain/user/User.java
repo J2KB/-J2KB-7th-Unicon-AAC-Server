@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 @Getter @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User extends BaseEntity implements UserDetails {
+public class User extends BaseEntity {
     @Override
     public String toString() {
         return "nickname: " + nickname;
@@ -33,7 +33,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Setter
     private String password;
-    private boolean working;
+    private String working;
     private String job;
     private int postCount;
     private int purchaseCount;
@@ -42,51 +42,14 @@ public class User extends BaseEntity implements UserDetails {
     private String provider;    // oauth2를 이용할 경우 어떤 플랫폼을 이용하는지
     private String providerId;
 
-    @Enumerated(EnumType.STRING)
-    @Setter
-    private Role role;
+//    @Enumerated(EnumType.STRING)
+//    @Setter
+//    private Role role;
 
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private List<String> roles = new ArrayList<>();
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.roles.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
-    }
-
-
-    public User(UserSignupRequestDto request) {
-        password = request.getPassword();
-    }
-
-    @Override
-    public String getUsername() {
-        return nickname;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 
     public void update(String nickname) {
         this.nickname = nickname;
@@ -97,14 +60,14 @@ public class User extends BaseEntity implements UserDetails {
         this.nickname = username;
         this.password = password;
         this.email = email;
-        this.role = role;
+//        this.role = role;
     }
     @Builder(builderClassName = "OAuth2Register", builderMethodName = "oauth2Register")
     public User(String username, String password, String email, Role role, String provider, String providerId) {
         this.nickname = username;
         this.password = password;
         this.email = email;
-        this.role = role;
+//        this.role = role;
         this.provider = provider;
         this.providerId = providerId;
     }
