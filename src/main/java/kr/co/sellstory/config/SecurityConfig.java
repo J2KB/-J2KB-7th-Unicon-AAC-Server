@@ -3,6 +3,7 @@ package kr.co.sellstory.config;
 import kr.co.sellstory.service.auth.PrincipalOauth2UserService;
 import kr.co.sellstory.service.jwt.JwtAuthenticationFilter;
 import kr.co.sellstory.service.jwt.JwtTokenService;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ import java.security.Principal;
 
 @Slf4j
 @EnableWebSecurity
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -52,35 +53,45 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.authorizeRequests()
-                .antMatchers("/user/**").authenticated()
-                .antMatchers("/manager/**").access("hasRole('MANAGER') or hasRole('ADMIN')")
-                .antMatchers("/admin/**").hasRole("ADMIN")
-                .anyRequest().permitAll()
-                .and()					//추가
-                .oauth2Login()				// OAuth2기반의 로그인인 경우
-                .loginPage("/loginForm")		// 인증이 필요한 URL에 접근하면 /loginForm으로 이동
-                .defaultSuccessUrl("/")			// 로그인 성공하면 "/" 으로 이동
-                .failureUrl("/loginForm")		// 로그인 실패 시 /loginForm으로 이동
-                .userInfoEndpoint()			// 로그인 성공 후 사용자정보를 가져온다
-                .userService(principalOauth2UserService);	//사용자정보를 처리할 때 사용한다
+//        http.authorizeRequests()
+//                .antMatchers("/user/**").authenticated()
+//                .antMatchers("/manager/**").access("hasRole('MANAGER') or hasRole('ADMIN')")
+//                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .anyRequest().permitAll()
+//                .and()					//추가
+//                .oauth2Login()				// OAuth2기반의 로그인인 경우
+//                .loginPage("/loginForm")// 인증이 필요한 URL에 접근하면 /loginForm으로 이동
+//                .defaultSuccessUrl("/")			// 로그인 성공하면 "/" 으로 이동
+//                .failureUrl("/loginForm")// 로그인 실패 시 /loginForm으로 이동
+//                .userInfoEndpoint()			// 로그인 성공 후 사용자정보를 가져온다
+//                .userService(principalOauth2UserService);	//사용자정보를 처리할 때 사용한다
 
         http
                 .httpBasic().disable() // rest api 만을 고려하여 기본 설정은 해제
                 .csrf().disable() // csrf 보안 토큰 disable처리.
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // 세션 사용 안함
                 .and()
-                .authorizeRequests().requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // 요청에 대한 사용권한 체크
+                .authorizeRequests()
+                .antMatchers("/user/**").authenticated()
+                .antMatchers("/manager/**").access("hasRole('MANAGER') or hasRole('ADMIN')")
                 .antMatchers("/admin/**").hasRole("ADMIN")
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll() // 요청에 대한 사용권한 체크
                 // TODO: 유저 권한 설정 방법으로 추후 필요해지면 수정
                 //.antMatchers("/user/**").hasRole("USER")
                 .antMatchers(HttpMethod.GET).permitAll()
                 .anyRequest().permitAll() // 그외 나머지 요청은 누구나 접근 가능
-                .and()
+                .and()					//추가
                 .cors()
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenService),
-                        UsernamePasswordAuthenticationFilter.class);
+                        UsernamePasswordAuthenticationFilter.class)
+                .oauth2Login()				// OAuth2기반의 로그인인 경우
+                .loginPage("/loginForm")// 인증이 필요한 URL에 접근하면 /loginForm으로 이동
+                .defaultSuccessUrl("/")			// 로그인 성공하면 "/" 으로 이동
+                .failureUrl("/loginForm")// 로그인 실패 시 /loginForm으로 이동
+                .userInfoEndpoint()			// 로그인 성공 후 사용자정보를 가져온다
+                .userService(principalOauth2UserService);	//사용자정보를 처리할 때 사용한다
+
 
 
         // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 전에 넣는다
